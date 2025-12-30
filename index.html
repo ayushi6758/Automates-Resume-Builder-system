@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder & Mock Interview</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Resume Builder & Mock Interview Assistant</h1>
+            <p>Create your professional resume and practice interviews</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('resume')">Resume Builder</button>
+            <button class="tab-btn" onclick="showTab('training')">Interview Training</button>
+            <button class="tab-btn" onclick="showTab('interview')">Mock Interview</button>
+        </div>
+
+       
+        <div id="resume-tab" class="tab-content active">
+            <div class="form-container">
+                <h2>Enter Your Details</h2>
+                
+                <div class="template-selector">
+                    <h3>Choose Template</h3>
+                    <div class="template-options">
+                        <div class="template-option" onclick="selectTemplate('modern')">
+                            <div class="template-preview modern-preview"></div>
+                            <p>Modern</p>
+                        </div>
+                        <div class="template-option" onclick="selectTemplate('professional')">
+                            <div class="template-preview professional-preview"></div>
+                            <p>Professional</p>
+                        </div>
+                        <div class="template-option" onclick="selectTemplate('creative')">
+                            <div class="template-preview creative-preview"></div>
+                            <p>Creative</p>
+                        </div>
+                        <div class="template-option" onclick="selectTemplate('minimal')">
+                            <div class="template-preview minimal-preview"></div>
+                            <p>Minimal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="resume-form">
+                    <input type="hidden" id="selected-template" value="modern">
+                    
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="name" required placeholder="Ayushi">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Target Role *</label>
+                        <input type="text" id="role" required placeholder="Software Developer">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contact Information *</label>
+                        <input type="text" id="contact" required placeholder="abc@gmail.com | +91 9644567890 | LinkedIn | GitHub">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Skills (comma separated) *</label>
+                        <textarea id="skills" required placeholder="Python, JavaScript, React, SQL"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Education *</label>
+                        <textarea id="education" required placeholder="Bachelor of Science in Computer Science"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Experience *</label>
+                        <textarea id="experience" required placeholder="Software Developer at ABC Company (2022-Present)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Achievements</label>
+                        <textarea id="achievements" placeholder="Certification
+Awarded for XYZ work"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Projects</label>
+                        <textarea id="projects" placeholder="E-commerce Platform 
+company projects"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Generate Resume</button>
+                </form>
+            </div>
+
+            <div id="resume-output" class="output-container" style="display: none;">
+                <div class="output-header">
+                    <h2>Your Resume</h2>
+                    <button onclick="downloadResume()" class="btn-secondary">Download PDF</button>
+                </div>
+                <div id="resume-content"></div>
+            </div>
+        </div>
+
+        
+        <div id="training-tab" class="tab-content">
+            <div class="training-container">
+                <h2>Interview Training Center</h2>
+                <p>Practice answering different types of interview questions</p>
+
+                <div class="training-categories">
+                    <button class="category-btn" onclick="practiceCategory('hr')">
+                        <h3>HR Questions</h3>
+                        <p>Behavioral and cultural fit questions</p>
+                    </button>
+                    <button class="category-btn" onclick="practiceCategory('technical')">
+                        <h3>Technical Questions</h3>
+                        <p>Skills and technical expertise</p>
+                    </button>
+                    <button class="category-btn" onclick="practiceCategory('behavioral')">
+                        <h3>Behavioral Questions</h3>
+                        <p>Past experience and STAR method</p>
+                    </button>
+                    <button class="category-btn" onclick="practiceCategory('situational')">
+                        <h3>Situational Questions</h3>
+                        <p>Problem-solving scenarios</p>
+                    </button>
+                </div>
+
+                <div id="practice-area" style="display: none;">
+                    <div class="practice-header">
+                        <h3 id="practice-category-title">Practice Question</h3>
+                        <button onclick="newPracticeQuestion()" class="btn-secondary">New Question</button>
+                    </div>
+
+                    <div class="tips-box">
+                        <h4>Tips for answering:</h4>
+                        <ul id="answer-tips"></ul>
+                    </div>
+
+                    <div class="question-box">
+                        <p id="practice-question"></p>
+                    </div>
+
+                    <div class="answer-box">
+                        <label>Your Answer:</label>
+                        <textarea id="practice-answer" placeholder="Type your answer here..." rows="8"></textarea>
+                        <div class="word-counter">
+                            <span id="word-count">0 words</span>
+                        </div>
+                        <button onclick="evaluatePracticeAnswer()" class="btn-primary">Get Feedback</button>
+                    </div>
+
+                    <div id="practice-feedback" class="feedback-box" style="display: none;">
+                        <h4>Evaluation Results:</h4>
+                        <div class="evaluation-scores">
+                            <div class="score-item">
+                                <span>Length:</span>
+                                <span id="length-score"></span>
+                            </div>
+                            <div class="score-item">
+                                <span>Detail:</span>
+                                <span id="detail-score"></span>
+                            </div>
+                            <div class="score-item">
+                                <span>Structure:</span>
+                                <span id="structure-score"></span>
+                            </div>
+                        </div>
+                        <div class="overall-rating">
+                            <strong>Overall Rating:</strong> <span id="practice-rating"></span>
+                        </div>
+                        <div class="suggestions">
+                            <h4>Suggestions:</h4>
+                            <ul id="practice-suggestions"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+        <div id="interview-tab" class="tab-content">
+            <div id="interview-start" class="interview-container">
+                <h2>Mock Interview Preparation</h2>
+                <p>Complete a full mock interview with AI-powered questions based on your resume.</p>
+                <div class="interview-info">
+                    <h3>What to expect:</h3>
+                    <ul>
+                        <li>7 questions covering HR, Technical, Behavioral, and Situational topics</li>
+                        <li>Questions tailored to your role and experience</li>
+                        <li>Instant feedback on each answer</li>
+                        <li>Performance summary at the end</li>
+                    </ul>
+                </div>
+                <button onclick="startInterview()" class="btn-primary">Start Interview</button>
+            </div>
+
+            <div id="interview-active" class="interview-container" style="display: none;">
+                <div class="question-header">
+                    <span id="question-counter">Question 1 of 7</span>
+                    <span id="question-type" class="badge">HR</span>
+                </div>
+                
+                <div class="question-box">
+                    <h3>Interview Question:</h3>
+                    <p id="current-question"></p>
+                </div>
+
+                <div class="answer-box">
+                    <label>Your Answer:</label>
+                    <textarea id="answer-input" placeholder="Type your answer here..." rows="6"></textarea>
+                    <button onclick="submitAnswer()" class="btn-primary">Submit Answer</button>
+                </div>
+
+                <div id="feedback-box" class="feedback-box" style="display: none;">
+                    <h4>Feedback:</h4>
+                    <div class="feedback-rating">
+                        <span id="feedback-rating"></span>
+                    </div>
+                    <p id="feedback-comment"></p>
+                    <button onclick="nextQuestion()" class="btn-secondary">Next Question</button>
+                </div>
+            </div>
+
+            <div id="interview-complete" class="interview-container" style="display: none;">
+                <h2>Interview Completed!</h2>
+                <p>Great job! You've completed all the interview questions.</p>
+                <div id="interview-summary"></div>
+                <button onclick="restartInterview()" class="btn-primary">Start New Interview</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
